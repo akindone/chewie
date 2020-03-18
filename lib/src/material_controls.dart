@@ -8,7 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 class MaterialControls extends StatefulWidget {
-  const MaterialControls({Key key}) : super(key: key);
+  const MaterialControls({
+    Key key,
+    this.backgroundColor,
+    this.centerPlayIcon,
+    this.textStyle = const TextStyle(color: Colors.black, fontSize: 12),
+    this.barHeight = 48,
+  }) : super(key: key);
+
+  final Color backgroundColor;
+  final Icon centerPlayIcon;
+  final double barHeight;
+  final TextStyle textStyle;
 
   @override
   State<StatefulWidget> createState() {
@@ -26,7 +37,6 @@ class _MaterialControlsState extends State<MaterialControls> {
   bool _dragging = false;
   bool _displayTapped = false;
 
-  final barHeight = 48.0;
   final marginSize = 5.0;
 
   VideoPlayerController controller;
@@ -113,13 +123,18 @@ class _MaterialControlsState extends State<MaterialControls> {
       opacity: _hideStuff ? 0.0 : 1.0,
       duration: Duration(milliseconds: 300),
       child: Container(
-        height: barHeight,
-        color: Theme.of(context).dialogBackgroundColor,
+        height: widget.barHeight,
+        color:
+            widget.backgroundColor ?? Theme.of(context).dialogBackgroundColor,
         child: Row(
           children: <Widget>[
             _buildPlayPause(controller),
             chewieController.isLive
-                ? Expanded(child: const Text('LIVE'))
+                ? Expanded(
+                    child: Text(
+                    'LIVE',
+                    style: widget.textStyle,
+                  ))
                 : _buildPosition(iconColor),
             chewieController.isLive ? const SizedBox() : _buildProgressBar(),
             chewieController.allowMuting
@@ -141,7 +156,7 @@ class _MaterialControlsState extends State<MaterialControls> {
         opacity: _hideStuff ? 0.0 : 1.0,
         duration: Duration(milliseconds: 300),
         child: Container(
-          height: barHeight,
+          height: widget.barHeight,
           margin: EdgeInsets.only(right: 12.0),
           padding: EdgeInsets.only(
             left: 8.0,
@@ -152,6 +167,7 @@ class _MaterialControlsState extends State<MaterialControls> {
               chewieController.isFullScreen
                   ? Icons.fullscreen_exit
                   : Icons.fullscreen,
+              color: widget.textStyle.color,
             ),
           ),
         ),
@@ -187,18 +203,19 @@ class _MaterialControlsState extends State<MaterialControls> {
                       ? 1.0
                       : 0.0,
               duration: Duration(milliseconds: 300),
-              child: GestureDetector(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).dialogBackgroundColor,
-                    borderRadius: BorderRadius.circular(48.0),
+              child: widget.centerPlayIcon ??
+                  GestureDetector(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).dialogBackgroundColor,
+                        borderRadius: BorderRadius.circular(48.0),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(12.0),
+                        child: Icon(Icons.play_arrow, size: 32.0),
+                      ),
+                    ),
                   ),
-                  child: Padding(
-                    padding: EdgeInsets.all(12.0),
-                    child: Icon(Icons.play_arrow, size: 32.0),
-                  ),
-                ),
-              ),
             ),
           ),
         ),
@@ -226,7 +243,7 @@ class _MaterialControlsState extends State<MaterialControls> {
         child: ClipRect(
           child: Container(
             child: Container(
-              height: barHeight,
+              height: widget.barHeight,
               padding: EdgeInsets.only(
                 left: 8.0,
                 right: 8.0,
@@ -235,6 +252,7 @@ class _MaterialControlsState extends State<MaterialControls> {
                 (_latestValue != null && _latestValue.volume > 0)
                     ? Icons.volume_up
                     : Icons.volume_off,
+                color: widget.textStyle.color,
               ),
             ),
           ),
@@ -247,7 +265,7 @@ class _MaterialControlsState extends State<MaterialControls> {
     return GestureDetector(
       onTap: _playPause,
       child: Container(
-        height: barHeight,
+        height: widget.barHeight,
         color: Colors.transparent,
         margin: EdgeInsets.only(left: 8.0, right: 4.0),
         padding: EdgeInsets.only(
@@ -255,7 +273,10 @@ class _MaterialControlsState extends State<MaterialControls> {
           right: 12.0,
         ),
         child: Icon(
-          controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
+          controller.value.isPlaying
+              ? Icons.pause_circle_outline
+              : Icons.play_circle_outline,
+          color: widget.textStyle.color,
         ),
       ),
     );
@@ -273,9 +294,7 @@ class _MaterialControlsState extends State<MaterialControls> {
       padding: EdgeInsets.only(right: 24.0),
       child: Text(
         '${formatDuration(position)} / ${formatDuration(duration)}',
-        style: TextStyle(
-          fontSize: 14.0,
-        ),
+        style: widget.textStyle,
       ),
     );
   }

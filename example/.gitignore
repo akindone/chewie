@@ -11,3 +11,5 @@ pubspec.lock
 .flutter-plugins
 Podfile.lock
 lib/generated_plugin_registrant.dart
+.flutter-plugins-dependencies
+ios/Flutter/flutter_export_environment.sh
